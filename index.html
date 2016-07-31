@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="lib/css/metro.min.css">
+    <link rel="stylesheet" href="lib/css/metro-icons.min.css">
+    <link rel="stylesheet" href="lib/css/metro-responsive.min.css">
+    <link rel="stylesheet" href="lib/css/metro-schemes.min.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <script src="lib/js/require.js" data-main="js/main" defer async></script>
+</head>
+<body>
+<div id="main">
+    <div id="top">
+        <div class="app-bar darcula">
+            <span class="app-bar-element" style="cursor: default">WeekParty</span>
+            <span class="app-bar-divider"></span>
+            <ul class="app-bar-menu">
+                <li><a role="button" class="dropdown-toggle">A</a>
+                    <ul class="d-menu" data-role="dropdown">
+                        <li><a id="WPjs-newfile" role="button">
+                            <span class="mif-file-empty icon fg-grayLighter"></span>
+                            A1
+                        </a></li>
+                    </ul>
+                </li>
+                <li><a role="button" class="dropdown-toggle">B</a>
+                    <ul class="d-menu" data-role="dropdown" data-no-close="true">
+                        <li><a role="button" onclick="$(this).children('.icon').fadeToggle(100);">
+                            <span class="mif-checkmark icon fg-grayLighter"></span>
+                            B1
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="middle">
+        <div id="left"></div>
+        <div id="center"></div>
+        <div id="right"></div>
+    </div>
+    <div id="bottom"></div>
+</div>
+<div id="query"></div>
+</body>
+</html>
