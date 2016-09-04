@@ -70,7 +70,7 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
             }, function (e) {
                 console.log("Error with decoding audio data" + e.err);
             });
-            var blob = new Blob([req.response], {
+            var blob = new Blob([data], {
                 type: "video/mpeg4"
             });
             var url = URL.createObjectURL(blob);
