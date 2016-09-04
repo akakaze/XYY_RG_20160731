@@ -33,7 +33,7 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
             this.attributes.source = source;
 
             ajax("GET", source, "arraybuffer", this._ajaxProgress)
-                .then(this._ajaxResolve, this._ajaxReject);
+                .then(this._ajaxResolve.bind(this.attributes), this._ajaxReject);
         },
         videoPlay: function () {
             this.attributes.video.play();
@@ -73,8 +73,7 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
             var blob = new Blob([data], {
                 type: "video/mpeg4"
             });
-            var url = URL.createObjectURL(blob);
-            this.attributes.video.setAttribute("src", url);
+            this.video.setAttribute("src", URL.createObjectURL(blob));
         },
         _ajaxReject: function (data) {
             console.error(JSON.parse(data));
