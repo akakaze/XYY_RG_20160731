@@ -31,32 +31,9 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
         },
         setSource: function (source) {
             this.attributes.source = source;
-            var _video = this.attributes.video;
-            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-            var request = new XMLHttpRequest();
-            request.open("GET", source, true);
-            request.responseType = "arraybuffer";
-            request.onprogress = function (event) {
-                var prog = Math.floor(event.loaded * 100 / event.total);
-                console.log("progress : " + prog + "%");
-            };
-            request.onload = function() {
-                audioCtx.decodeAudioData(request.response, function (buffer) {
-                    for (var channel = 0; channel < buffer.numberOfChannels; channel ++) {
-                        console.log(buffer.getChannelData(channel));
-                    }
-                }, function (e) {
-                    console.log("Error with decoding audio data" + e.err);
-                });
-                var blob = new Blob([request.response], {
-                    type: "video/mpeg4"
-                });
-                var url = URL.createObjectURL(blob);
-                _video.setAttribute("src", url);
-            };
-            request.send();
-            //this.attributes.video.load();
+            ajax("GET", source, "arraybuffer", this._ajaxProgress)
+                .then(this._ajaxResolve, this._ajaxReject);
         },
         videoPlay: function () {
             this.attributes.video.play();
@@ -79,6 +56,28 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
         },
         _pause: function () {
             clearInterval(this.interval);
+        },
+        _ajaxProgress: function (event) {
+            var prog = Math.floor(event.loaded * 100 / event.total);
+            console.log("progress : " + prog + "%");
+        },
+        _ajaxResolve: function (data) {
+            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx.decodeAudioData(data, function (buffer) {
+                for (var channel = 0; channel < buffer.numberOfChannels; channel ++) {
+                    console.log(buffer.getChannelData(channel));
+                }
+            }, function (e) {
+                console.log("Error with decoding audio data" + e.err);
+            });
+            var blob = new Blob([req.response], {
+                type: "video/mpeg4"
+            });
+            var url = URL.createObjectURL(blob);
+            this.attributes.video.setAttribute("src", url);
+        },
+        _ajaxReject: function (data) {
+            console.log(2, 'error', JSON.parse(data));
         }
     });
     const viewApp = Backbone.View.extend({
@@ -110,3 +109,23 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
         }
     }
 });
+
+function ajax (method, url, type, progress) {
+    return new Promise(function (resolve, reject) {
+        var req = new XMLHttpRequest();
+        req.responseType = type;
+        req.open(method, url);
+        req.onload = function () {
+            if (this.status >= 200 && this.status < 300) {
+                resolve(this.response);
+            } else {
+                reject(this.statusText);
+            }
+        };
+        req.onerror = function () {
+            reject(this.statusText);
+        };
+        req.onprogress = progress;
+        req.send();
+    });
+}
