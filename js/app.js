@@ -31,7 +31,31 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
         },
         setSource: function (source) {
             this.attributes.source = source;
-            this.attributes.video.setAttribute("src", source);
+            var _video = this.attributes.video;
+            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            var request = new XMLHttpRequest();
+            request.open("GET", source, true);
+            request.responseType = "arraybuffer";
+            request.onprogress = function (event) {
+                var prog = Math.floor(event.loaded * 100 / event.total);
+                console.log("progress : " + prog + "%");
+            };
+            request.onload = function() {
+                audioCtx.decodeAudioData(request.response, function (buffer) {
+                    for (var channel = 0; channel < buffer.numberOfChannels; channel ++) {
+                        console.log(buffer.getChannelData(channel));
+                    }
+                }, function (e) {
+                    console.log("Error with decoding audio data" + e.err);
+                });
+                var blob = new Blob([request.response], {
+                    type: "video/mpeg4"
+                });
+                var url = URL.createObjectURL(blob);
+                _video.setAttribute("src", url);
+            };
+            request.send();
             //this.attributes.video.load();
         },
         videoPlay: function () {
