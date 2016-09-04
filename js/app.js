@@ -65,10 +65,10 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
             var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             audioCtx.decodeAudioData(data, function (buffer) {
                 for (var channel = 0; channel < buffer.numberOfChannels; channel ++) {
-                    console.log(buffer.getChannelData(channel));
+                    console.dir(buffer.getChannelData(channel));
                 }
             }, function (e) {
-                console.log("Error with decoding audio data" + e.err);
+                console.error("Error with decoding audio data" + e.err);
             });
             var blob = new Blob([data], {
                 type: "video/mpeg4"
@@ -77,7 +77,7 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
             this.attributes.video.setAttribute("src", url);
         },
         _ajaxReject: function (data) {
-            console.log(2, 'error', JSON.parse(data));
+            console.error(JSON.parse(data));
         }
     });
     const viewApp = Backbone.View.extend({
