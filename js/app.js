@@ -74,6 +74,7 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
                 type: "video/mpeg4"
             });
             this.video.setAttribute("src", URL.createObjectURL(blob));
+            this.video.pause();
         },
         _ajaxReject: function (data) {
             console.error(JSON.parse(data));
@@ -87,7 +88,7 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
             this.templateGameControls = this.el.querySelector("#game_control");
             this.modelGameMedia = new modelGameMedia({view: this});
             this.modelGameMedia.setSource("media/video/xyy_rg_test.mp4");
-            this.modelGameMedia.videoPlay();
+            //this.modelGameMedia.videoPlay();
             console.log(this.modelGameMedia);
         },
         media2canvas: function () {
@@ -114,6 +115,7 @@ function ajax (method, url, type, progress) {
         var req = new XMLHttpRequest();
         req.responseType = type;
         req.open(method, url);
+        req.onprogress = progress;
         req.onload = function () {
             if (this.status >= 200 && this.status < 300) {
                 resolve(this.response);
@@ -124,7 +126,6 @@ function ajax (method, url, type, progress) {
         req.onerror = function () {
             reject(this.statusText);
         };
-        req.onprogress = progress;
         req.send();
     });
 }
