@@ -2,20 +2,6 @@
 * Created by akakaze on 2016/2/4.
 */
 define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3) {
-    // var Model = Backbone.Model.extend({
-    //     initialize: function () {}
-    // });
-    // var Collection = Backbone.Collection.extend({
-    //     model: Model,
-    //     initialize: function () {}
-    // });
-    // var AppView = Backbone.View.extend({
-    //     el: $("body"),
-    //     initialize: function () {
-    //         this.collection = new Collection();
-    //     },
-    //     events: {}
-    // });
     "use strict";
 
     const modelGameMedia = Backbone.Model.extend({
@@ -27,16 +13,15 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
             attr.video.addEventListener("loadedmetadata", this._loadedmetadata.bind(attr));
             attr.video.addEventListener("play", this._play.bind(attr));
             attr.video.addEventListener("pause", this._pause.bind(attr));
-            attr.ctx = attr.view.templateGameMedia.getContext("2d");
         },
         setSource: function (source) {
             this.attributes.source = source;
-
             ajax("GET", source, "arraybuffer", this._ajaxProgress)
                 .then(this._ajaxResolve.bind(this.attributes), this._ajaxReject);
         },
-        videoPlay: function () {
-            this.attributes.video.play();
+        videoToggle: function () {
+            this.attributes.video.paused ?
+                this.attributes.video.play() : this.attributes.video.pause();
         },
         _loadedmetadata: function () {
             var p = this.video.videoHeight / this.video.videoWidth;
@@ -52,7 +37,7 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
             this.top = (1080 - this.height) / 2;
         },
         _play: function () {
-            this.interval = setInterval(this.view.media2canvas.bind(this), 0);
+            this.interval = setInterval(this.view.media2canvas, 0, this);
         },
         _pause: function () {
             clearInterval(this.interval);
@@ -74,6 +59,7 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
                 type: "video/mpeg4"
             });
             this.video.setAttribute("src", URL.createObjectURL(blob));
+            this.view.media2canvas(this);
             this.video.pause();
         },
         _ajaxReject: function (data) {
@@ -88,17 +74,22 @@ define(["jquery", "underscore", "backbone", "d3"], function ($, _, Backbone, d3)
             this.templateGameControls = this.el.querySelector("#game_control");
             this.modelGameMedia = new modelGameMedia({view: this});
             this.modelGameMedia.setSource("media/video/xyy_rg_test.mp4");
-            //this.modelGameMedia.videoPlay();
-            console.log(this.modelGameMedia);
+            this.media2canvas = this.media2canvas.bind(this);
         },
-        media2canvas: function () {
-            this.ctx.drawImage(
-                this.video,
-                this.left,
-                this.top,
-                this.width,
-                this.height
+        media2canvas: function (opt) {
+            this.templateGameMedia.getContext("2d").drawImage(
+                opt.video,
+                opt.left,
+                opt.top,
+                opt.width,
+                opt.height
             );
+        },
+        events: {
+            "click": "videoToggle"
+        },
+        videoToggle: function () {
+            this.modelGameMedia.videoToggle();
         }
     });
 
